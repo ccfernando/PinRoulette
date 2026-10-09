@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PinRoulette</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="roulette-stage" aria-label="Image roulette">
+        <div class="wheel-wrap">
+          <div class="pointer" aria-hidden="true"></div>
+          <div class="wheel" id="wheel"></div>
+          <button class="hub" id="hubSpinButton" type="button" aria-label="Spin roulette">
+            <span id="remainingCount">0</span>
+            <small>left</small>
+          </button>
+        </div>
+
+        <div class="controls">
+          <button class="primary-button" id="spinButton" type="button">Start</button>
+          <button class="ghost-button" id="resetButton" type="button">Reset</button>
+        </div>
+      </section>
+    </main>
+
+    <dialog class="result-modal" id="resultModal">
+      <form method="dialog">
+        <button class="close-button" type="submit" aria-label="Close result">x</button>
+      </form>
+      <img id="winnerImage" alt="" />
+      <p id="winnerName"></p>
+      <form method="dialog">
+        <button class="primary-button" type="submit">Continue</button>
+      </form>
+    </dialog>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
