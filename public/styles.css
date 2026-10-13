@@ -9,6 +9,12 @@
   --gold: #f0b43a;
   --tile: #fffaf4;
   --shadow: 0 24px 70px rgb(38 29 21 / 18%);
+  --rarity-common: #667085;
+  --rarity-uncommon: #159947;
+  --rarity-rare: #2474d9;
+  --rarity-epic: #9135d8;
+  --rarity-legendary: #d98a12;
+  --rarity-mythic: #d7266b;
 }
 
 * {
@@ -81,6 +87,7 @@ button {
 
 .wheel-item {
   --angle: 0deg;
+  --rarity-color: var(--rarity-common);
   position: absolute;
   z-index: 1;
   left: 50%;
@@ -93,13 +100,33 @@ button {
   transform-origin: center;
 }
 
+.wheel-item.rarity-uncommon {
+  --rarity-color: var(--rarity-uncommon);
+}
+
+.wheel-item.rarity-rare {
+  --rarity-color: var(--rarity-rare);
+}
+
+.wheel-item.rarity-epic {
+  --rarity-color: var(--rarity-epic);
+}
+
+.wheel-item.rarity-legendary {
+  --rarity-color: var(--rarity-legendary);
+}
+
+.wheel-item.rarity-mythic {
+  --rarity-color: var(--rarity-mythic);
+}
+
 .image-frame {
   width: 100%;
   height: 100%;
-  border: 4px solid var(--tile);
+  border: 4px solid var(--rarity-color);
   border-radius: 50%;
   background: var(--tile);
-  box-shadow: 0 10px 22px rgb(28 25 22 / 22%);
+  box-shadow: 0 10px 22px rgb(28 25 22 / 22%), 0 0 0 4px rgb(255 255 255 / 80%);
   display: block;
   overflow: hidden;
 }
@@ -110,6 +137,38 @@ button {
   display: block;
   object-fit: cover;
   object-position: center;
+}
+
+.rarity-label {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: -4px;
+  max-width: 112%;
+  transform: translateX(-50%);
+  border: 2px solid rgb(255 255 255 / 86%);
+  border-radius: 999px;
+  padding: 3px 7px;
+  background: var(--rarity-color);
+  color: white;
+  box-shadow: 0 7px 14px rgb(28 25 22 / 22%);
+  font-size: clamp(.52rem, 1.6vw, .72rem);
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.wheel-item.rarity-legendary .image-frame,
+.wheel-item.rarity-mythic .image-frame {
+  animation: rarePulse 1.6s ease-in-out infinite;
+}
+
+.wheel-item.rarity-mythic .image-frame {
+  box-shadow:
+    0 10px 22px rgb(28 25 22 / 24%),
+    0 0 0 4px rgb(255 255 255 / 82%),
+    0 0 24px rgb(215 38 107 / 46%);
 }
 
 .wheel-item.is-picked {
@@ -206,6 +265,7 @@ button {
 }
 
 .result-modal {
+  --rarity-color: var(--rarity-common);
   width: min(92vw, 560px);
   border: 0;
   border-radius: 8px;
@@ -213,6 +273,26 @@ button {
   background: white;
   color: var(--ink);
   box-shadow: var(--shadow);
+}
+
+.result-modal.rarity-uncommon {
+  --rarity-color: var(--rarity-uncommon);
+}
+
+.result-modal.rarity-rare {
+  --rarity-color: var(--rarity-rare);
+}
+
+.result-modal.rarity-epic {
+  --rarity-color: var(--rarity-epic);
+}
+
+.result-modal.rarity-legendary {
+  --rarity-color: var(--rarity-legendary);
+}
+
+.result-modal.rarity-mythic {
+  --rarity-color: var(--rarity-mythic);
 }
 
 .result-modal::backdrop {
@@ -226,14 +306,56 @@ button {
   object-fit: contain;
   border-radius: 8px;
   background: #f4f0eb;
+  border: 4px solid var(--rarity-color);
 }
 
 .result-modal p {
-  margin: 14px 0 18px;
-  color: var(--muted);
-  font-weight: 800;
+  margin: 8px 0 18px;
+  color: var(--rarity-color);
+  font-size: clamp(1.15rem, 4vw, 1.75rem);
+  font-weight: 900;
   text-align: center;
   overflow-wrap: anywhere;
+}
+
+.winner-rarity {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin: 14px auto 0;
+  border-radius: 999px;
+  padding: 6px 12px;
+  background: var(--rarity-color);
+  color: white;
+  box-shadow: 0 10px 22px rgb(28 25 22 / 18%);
+  font-size: .82rem;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+}
+
+.result-modal.rarity-legendary,
+.result-modal.rarity-mythic {
+  overflow: hidden;
+}
+
+.result-modal.rarity-legendary::after,
+.result-modal.rarity-mythic::after {
+  content: "";
+  position: absolute;
+  inset: -45%;
+  background:
+    linear-gradient(115deg, transparent 38%, rgb(255 255 255 / 42%) 48%, transparent 58%);
+  pointer-events: none;
+  transform: translateX(-34%) rotate(8deg);
+  animation: shimmerSweep 2.6s ease-in-out infinite;
+}
+
+.result-modal.rarity-legendary img,
+.result-modal.rarity-mythic img {
+  box-shadow:
+    0 16px 36px rgb(28 25 22 / 18%),
+    0 0 34px color-mix(in srgb, var(--rarity-color), transparent 42%);
 }
 
 .result-modal form {
@@ -254,6 +376,28 @@ button {
   font-weight: 900;
 }
 
+@keyframes rarePulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes shimmerSweep {
+  0% {
+    transform: translateX(-42%) rotate(8deg);
+  }
+
+  58%,
+  100% {
+    transform: translateX(42%) rotate(8deg);
+  }
+}
+
 @media (max-width: 560px) {
   .app-shell {
     padding: 16px;
@@ -261,6 +405,11 @@ button {
 
   .wheel-item {
     width: clamp(44px, 14vw, 64px);
+  }
+
+  .rarity-label {
+    bottom: -8px;
+    padding: 2px 5px;
   }
 
   .controls {

@@ -6,6 +6,7 @@ const resetButton = document.querySelector("#resetButton");
 const remainingCount = document.querySelector("#remainingCount");
 const resultModal = document.querySelector("#resultModal");
 const winnerImage = document.querySelector("#winnerImage");
+const winnerRarity = document.querySelector("#winnerRarity");
 const winnerName = document.querySelector("#winnerName");
 
 // ========================================
@@ -45,6 +46,68 @@ let isSpinning = false;
 
 const SPIN_DURATION = 10000;
 
+const RARITIES = [
+  {
+    name: "Mythic",
+    className: "mythic",
+    weight: 0.5,
+  },
+  {
+    name: "Legendary",
+    className: "legendary",
+    weight: 1,
+  },
+  {
+    name: "Epic",
+    className: "epic",
+    weight: 4,
+  },
+  {
+    name: "Rare",
+    className: "rare",
+    weight: 10,
+  },
+  {
+    name: "Uncommon",
+    className: "uncommon",
+    weight: 25,
+  },
+  {
+    name: "Common",
+    className: "common",
+    weight: 60,
+  },
+];
+
+const defaultRarity = RARITIES.find(
+  (rarity) => rarity.name === "Common"
+);
+
+function getDisplayName(name) {
+  return name.replace(/\.[^.]+$/, "");
+}
+
+function getRarityFromName(name) {
+  const displayName = getDisplayName(name);
+
+  return (
+    RARITIES.find((rarity) => {
+      const pattern = new RegExp(`\\b${rarity.name}\\b`, "i");
+      return pattern.test(displayName);
+    }) || defaultRarity
+  );
+}
+
+function enrichImage(image) {
+  const rarity = getRarityFromName(image.name);
+
+  return {
+    ...image,
+    displayName: getDisplayName(image.name),
+    rarity,
+  };
+}
+
 // ========================================
 // RENDER WHEEL
 // ========================================
@@ -60,10 +123,11 @@ function renderWheel() {
   allImages.forEach((image, index) => {
     const item = document.createElement("div");
     const angle = (360 / count) * index;
+    const rarity = image.rarity;
 
     item.className = `wheel-item${
       activeNames.has(image.name) ? "" : " is-picked"
-    }`;
+    } rarity-${rarity.className}`;
 
     item.style.setProperty("--angle", `${angle}deg`);
 
@@ -72,10 +136,15 @@ function renderWheel() {
 
     const img = document.createElement("img");
     img.src = image.url;
-    img.alt = image.name.replace(/\.[^.]+$/, "");
+    img.alt = image.displayName;
     img.loading = "eager";
 
+    const rarityLabel = document.createElement("span");
+    rarityLabel.className = "rarity-label";
+    rarityLabel.textContent = rarity.name;
+
     imageFrame.append(img);
+    item.append(rarityLabel);
     item.append(imageFrame);
     wheel.append(item);
   });
@@ -96,11 +165,22 @@ function renderWheel() {
 // ========================================
 
 function pickWinner() {
-  const winnerIndex = Math.floor(
-    Math.random() * activeImages.length
+  const totalWeight = activeImages.reduce(
+    (total, image) => total + image.rarity.weight,
+    0
   );
 
-  return activeImages[winnerIndex];
+  let roll = Math.random() * totalWeight;
+
+  for (const image of activeImages) {
+    roll -= image.rarity.weight;
+
+    if (roll <= 0) {
+      return image;
+    }
+  }
+
+  return activeImages[activeImages.length - 1];
 }
 
 // ========================================
@@ -108,9 +188,14 @@ function pickWinner() {
 // ========================================
 
 function showWinner(winner) {
+  const rarity = winner.rarity;
+
   winnerImage.src = winner.url;
-  winnerImage.alt = winner.name.replace(/\.[^.]+$/, "");
-  winnerName.textContent = winner.name.replace(/\.[^.]+$/, "");
+  winnerImage.alt = winner.displayName;
+  winnerRarity.textContent = rarity.name;
+  winnerName.textContent = winner.displayName;
+  resultModal.className =
+    `result-modal rarity-${rarity.className}`;
 
   activeImages = activeImages.filter(
     (image) => image.name !== winner.name
@@ -220,7 +305,7 @@ async function loadImages() {
 
     const data = await response.json();
 
-    allImages = data.images;
+    allImages = data.images.map(enrichImage);
     activeImages = [...allImages];
 
     if (allImages.length === 0) {

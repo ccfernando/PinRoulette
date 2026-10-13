@@ -9,6 +9,8 @@ PinRoulette is a small image roulette web app. It loads every image from `data/i
 - Serves sound files from `data/sounds`
 - Plays looping background music after the first user interaction
 - Plays a spin sound during the 10-second roulette animation
+- Detects rarity words in image filenames and uses them for weighted drops
+- Shows rarity labels on the wheel and colors the winner title by rarity
 - Circular image roulette layout
 - Click either the `Start` button or the red center button to spin
 - Shows the selected image in a modal
@@ -48,6 +50,42 @@ data/images
 ```
 
 Restart the server after adding or removing files so the app can reload the image list.
+
+## Set Rarity
+
+Add one of these rarity words anywhere in an image filename:
+
+```text
+Common
+Uncommon
+Rare
+Epic
+Legendary
+Mythic
+```
+
+Examples:
+
+```text
+Common - Cat Pin.png
+Rare - Glitter Duck.jpg
+Legendary - Golden Badge.webp
+```
+
+Images without a rarity word are treated as `Common`.
+
+Drop weights are:
+
+```text
+Common     60
+Uncommon   25
+Rare       10
+Epic        4
+Legendary   1
+Mythic      0.5
+```
+
+The final chance depends on the remaining items in the wheel. For example, a `Legendary` item is much less likely to drop than a `Common` item while both are still available.
 
 ## Add Sounds
 
